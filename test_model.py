@@ -1,6 +1,8 @@
 # pip install -U "transformers>=4.42" accelerate peft torch --index-url https://download.pytorch.org/whl/cu121
 # ^ adjust the torch index-url / CUDA version as needed. CPU works too (slower).
 
+import time
+
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, GenerationConfig
 from peft import PeftModel
@@ -64,7 +66,10 @@ def chat(messages, max_new_tokens=64, temperature=0.1, top_p=0.9):
     )
 
     with torch.no_grad():
+        start = time.time()
         out = model.generate(**inputs, generation_config=gen_cfg)
+        end = time.time()
+    print(f"Inference time: {end - start:.3f}s")
     return tokenizer.decode(out[0], skip_special_tokens=True)
 
 # ---- Example: intent inference ----
